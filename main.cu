@@ -7,7 +7,7 @@
 #include <cuda_runtime.h>
 #include <curand_kernel.h>
 
-// Helper function to check for CUDA errors
+// helper function to check for CUDA errors
 #define CUDA_CHECK(err) { \
     cudaError_t err_code = (err); \
     if (err_code != cudaSuccess) { \
@@ -16,7 +16,7 @@
     } \
 }
 
-// --- CUDA Kernel to initialize cuRAND states ---
+// CUDA kernel to initialize cuRAND states
 __global__ void setup_kernel(curandState* states, unsigned long long seed, int num_simulations) {
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     if (idx < num_simulations) {
@@ -24,7 +24,7 @@ __global__ void setup_kernel(curandState* states, unsigned long long seed, int n
     }
 }
 
-// --- CUDA Kernel for the Monte Carlo simulation ---
+// CUDA kernel for MC simulation
 __global__ void monte_carlo_kernel(double S, double K, double T, double r, double sigma, int num_simulations, double* d_payoffs, curandState* states) {
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     if (idx < num_simulations) {
@@ -35,7 +35,7 @@ __global__ void monte_carlo_kernel(double S, double K, double T, double r, doubl
     }
 }
 
-// --- Host function to orchestrate the GPU Monte Carlo simulation ---
+// host fn to start the GPU MC simulation
 double monte_carlo_vanilla_call_gpu(double S, double K, double T, double r, double sigma, int num_simulations) {
     double* d_payoffs;
     curandState* d_states;
@@ -66,7 +66,7 @@ double monte_carlo_vanilla_call_gpu(double S, double K, double T, double r, doub
     return exp(-r * T) * (total_payoff / num_simulations);
 }
 
-// Function to calculate the price of a European call option using the Black-Scholes formula for validation
+// calculate the price of an option using BS
 double black_scholes_vanilla_call(double S, double K, double T, double r, double sigma) {
     double d1 = (log(S / K) + (r + 0.5 * pow(sigma, 2)) * T) / (sigma * sqrt(T));
     double d2 = d1 - sigma * sqrt(T);
@@ -77,7 +77,7 @@ int main() {
     double S, K, T, r, sigma;
 
     // --- Manual User Input for Market Data ---
-    std::cout << "Enter market data (fetched from your local machine):" << std::endl;
+    std::cout << "Enter market data:" << std::endl;
     std::cout << "  - Current Stock Price (S): ";
     std::cin >> S;
     std::cout << "  - Risk-Free Interest Rate (r): ";
